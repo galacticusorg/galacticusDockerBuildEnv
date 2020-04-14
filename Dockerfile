@@ -54,6 +54,7 @@ RUN     cd /opt &&\
 	rm -rf fgsl-0.9.4.tar.gz fgsl-0.9.4
     
 # install HDF5 v1.8.20
+RUN     apt -y install zlib1g-dev
 RUN     cd /opt &&\
 	wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.gz &&\
 	tar -vxzf hdf5-1.8.20.tar.gz &&\
