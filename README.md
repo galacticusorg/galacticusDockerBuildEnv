@@ -1,6 +1,6 @@
 # Docker Build Environment for Galacticus
 
-!(https://img.shields.io/docker/cloud/automated/galacticusorg/buildenv) !(https://img.shields.io/docker/cloud/build/galacticusorg/buildenv)
+![](https://img.shields.io/docker/cloud/automated/galacticusorg/buildenv) ![](https://img.shields.io/docker/cloud/build/galacticusorg/buildenv)
 
 A Docker container providing a build environment for the [Galacticus](https://github.com/galacticusorg/galacticus) galaxy formation model. It provides all compilers, libraries, and tools for compiling Galacticus from source.
 
