@@ -20,11 +20,11 @@ ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget http://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-10-20200405.tar.xz &&\
-	tar xf gcc-10-20200405.tar.xz &&\
+	wget http://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20200705.tar.xz &&\
+	tar xf gcc-11-20200705.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-10-20200405.tar.xz gcc-infrastructure.tar.xz
+	rm gcc-11-20200705.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v1.16
