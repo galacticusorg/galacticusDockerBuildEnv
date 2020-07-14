@@ -7,8 +7,8 @@ RUN apt -y update && \
     apt -y install wget make xz-utils
 
 ENV INSTALL_PATH /usr/local
-ENV PATH $INSTALL_PATH/gcc-10/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-10/lib64:$INSTALL_PATH/gcc-10/lib:/usr/lib/x86_64-linux-gnu
+ENV PATH $INSTALL_PATH/gcc-11/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-11/lib64:$INSTALL_PATH/gcc-11/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
 # Set build options.
@@ -19,7 +19,7 @@ ENV GALACTICUS_CFLAGS "-fuse-ld=bfd"
 ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 
 # Ensure tzdata is installed and be sure to do it non-interactively otherwise is can ask for the timezone which will crash the build.
-RUN     DEBIAN_FRONTEND="noninteractive" apt-get -y install tzdata
+RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
