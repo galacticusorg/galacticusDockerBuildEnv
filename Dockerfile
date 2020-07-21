@@ -43,19 +43,6 @@ RUN     cd /opt &&\
  	cd .. &&\
  	rm -rf gsl-1.16.tar.gz gsl-1.16
 	
-# install FGSL v0.9.4
-RUN     apt -y install file
-RUN     cd /opt &&\
-	wget https://www.lrz.de/services/software/mathematik/gsl/fortran/download/fgsl-0.9.4.tar.gz &&\
-	tar -vxzf fgsl-0.9.4.tar.gz &&\
-	cd fgsl-0.9.4 &&\
-	./configure --gsl $INSTALL_PATH --f90 gfortran --prefix $INSTALL_PATH &&\
-	make &&\
-	make test &&\
-	make install &&\
-	cd .. &&\
-	rm -rf fgsl-0.9.4.tar.gz fgsl-0.9.4
-    
 # install HDF5 v1.8.20
 RUN     apt -y install zlib1g-dev
 RUN     cd /opt &&\
