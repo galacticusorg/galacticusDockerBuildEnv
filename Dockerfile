@@ -30,18 +30,18 @@ RUN     cd $INSTALL_PATH &&\
 	rm gcc-11-20200705.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
-# install GSL v1.16
+# install GSL v2.6
 RUN     apt -y install texinfo
 RUN     cd /opt &&\
- 	wget http://ftp.gnu.org/pub/gnu/gsl/gsl-1.16.tar.gz &&\
- 	tar xvfz gsl-1.16.tar.gz &&\
- 	cd gsl-1.16 &&\
+ 	wget ftp://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz &&\
+ 	tar xvfz gsl-2.6.tar.gz &&\
+ 	cd gsl-2.6 &&\
  	./configure --prefix=$INSTALL_PATH &&\
  	make -j4 &&\
  	make check &&\
  	make install &&\
  	cd .. &&\
- 	rm -rf gsl-1.16.tar.gz gsl-1.16
+ 	rm -rf gsl-2.6.tar.gz gsl-2.6
 	
 # install HDF5 v1.8.20
 RUN     apt -y install zlib1g-dev
