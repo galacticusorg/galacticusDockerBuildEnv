@@ -23,11 +23,11 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget http://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20200705.tar.xz &&\
-	tar xf gcc-11-20200705.tar.xz &&\
+	wget http://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20200816.tar.xz &&
+	tar xf gcc-11-20200816.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-11-20200705.tar.xz gcc-infrastructure.tar.xz
+	rm gcc-11-20200816.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v2.6
