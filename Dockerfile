@@ -130,7 +130,6 @@ RUN     perl -MCPAN -e 'force("install","Scalar::Util")'
 RUN     perl -MCPAN -e 'force("install","Term::ANSIColor")'
 RUN     perl -MCPAN -e 'force("install","Text::Table")'
 RUN     perl -MCPAN -e 'force("install","XML::SAX::ParserFactory")'
-RUN     perl -MCPAN -e 'force("install","Sort::Topological")'
 RUN     perl -MCPAN -e 'force("install","Text::Template")'
 RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
