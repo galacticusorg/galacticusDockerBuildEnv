@@ -23,7 +23,7 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20210314.tar.xz &&
+	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20210314.tar.xz &&\
 	tar xf gcc-11-20210314.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
