@@ -115,7 +115,7 @@ RUN     cd /opt &&\
  # install Perl modules
 RUN     apt -y install expat
 RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl
+RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl
 # make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
 RUN     mkdir -p $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
 	cd $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
