@@ -10,7 +10,7 @@ ENV INSTALL_PATH /usr/local
 ENV PATH $INSTALL_PATH/gcc-11/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-11/lib64:$INSTALL_PATH/gcc-11/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
-
+ENV GCC_VERSION 11-20210717
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
@@ -23,11 +23,11 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-11-20210717.tar.xz &&\
-	tar xf gcc-11-20210314.tar.xz &&\
+	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
+	tar xf gcc-$GCC_VERSION.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-11-20210314.tar.xz gcc-infrastructure.tar.xz
+	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v2.6
