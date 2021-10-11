@@ -135,3 +135,6 @@ RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
 # install git
 RUN     apt -y install git
+
+# install latex and related tools
+RUN     apt -y install texlive texlive-latex-extra
