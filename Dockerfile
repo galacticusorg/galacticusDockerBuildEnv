@@ -10,7 +10,7 @@ ENV INSTALL_PATH /usr/local
 ENV PATH $INSTALL_PATH/gcc-11/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-11/lib64:$INSTALL_PATH/gcc-11/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
-ENV GCC_VERSION 11-20210717
+ENV GCC_VERSION 11-20211009
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
@@ -115,7 +115,7 @@ RUN     cd /opt &&\
  # install Perl modules
 RUN     apt -y install expat
 RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl
+RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl
 # make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
 RUN     mkdir -p $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
 	cd $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
