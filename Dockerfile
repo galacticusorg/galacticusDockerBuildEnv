@@ -117,8 +117,8 @@ RUN     apt -y install expat
 RUN     apt -y install perl
 RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl
 # make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
-RUN     mkdir -p $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
-	cd $INSTALL_PATH/share/perl/5.26.1/XML/SAX &&\
+RUN     mkdir -p $INSTALL_PATH/share/perl/5.30.0/XML/SAX &&\
+	cd $INSTALL_PATH/share/perl/5.30.0/XML/SAX &&\
 	ln -sf /etc/perl/XML/SAX/ParserDetails.ini
 
 ENV PERL_MM_USE_DEFAULT=1
