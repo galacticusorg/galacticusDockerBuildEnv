@@ -28,10 +28,12 @@ RUN     cd $INSTALL_PATH &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
-RUN     apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
+RUN     apt -y update && \
+	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v2.6
-RUN     apt -y install texinfo
+RUN     apt -y update && \
+	apt -y install texinfo
 RUN     cd /opt &&\
  	wget ftp://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz &&\
  	tar xvfz gsl-2.6.tar.gz &&\
@@ -44,7 +46,8 @@ RUN     cd /opt &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
 	
 # install HDF5 v1.8.20
-RUN     apt -y install zlib1g-dev
+RUN     apt -y update && \
+	apt -y install zlib1g-dev
 RUN     cd /opt &&\
 	wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.gz &&\
 	tar -vxzf hdf5-1.8.20.tar.gz &&\
@@ -60,7 +63,7 @@ RUN     cd /opt &&\
 	wget https://github.com/andreww/fox/archive/4.1.0.tar.gz &&\
 	tar xvfz 4.1.0.tar.gz &&\
 	cd fox-4.1.0 &&\
-	FC=gfortran ./configure &&\
+	FC=gfortran FCFLAGS="-fPIC" CFLAGS="-fPIC" ./configure &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
@@ -71,7 +74,7 @@ RUN     cd /opt &&\
 	wget ftp://ftp.fftw.org/pub/fftw/fftw-3.3.4.tar.gz &&\
 	tar xvfz fftw-3.3.4.tar.gz &&\
 	cd fftw-3.3.4 &&\
-	./configure --prefix=$INSTALL_PATH &&\
+	CFLAGS="-fPIC" FFLAGS="-fPIC" ./configure --prefix=$INSTALL_PATH &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
@@ -82,6 +85,7 @@ RUN     cd /opt &&\
 	wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz &&\
 	tar xvfz ann_1.1.2.tar.gz &&\
 	cd ann_1.1.2 &&\
+	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 -fPIC"/ Make-config &&\
 	make linux-g++  &&\
 	cp bin/* $INSTALL_PATH/bin/. &&\
 	cp lib/* $INSTALL_PATH/lib/. &&\
@@ -90,7 +94,8 @@ RUN     cd /opt &&\
 	rm -rf ann_1.1.2.tar.gz ann_1.1.2
 
 # install guile v1.8.8 (optional)
-RUN     apt -y install libltdl-dev libgmp-dev
+RUN     apt -y update && \
+	apt -y install libltdl-dev libgmp-dev
 RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
 	tar xvfz guile-1.8.8.tar.gz &&\
 	cd guile-1.8.8 &&\
@@ -101,7 +106,8 @@ RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
 	rm -rf xvfz guile-1.8.8.tar.gz guile-1.8.8
 
 # install matheval v1.1.11 (optional)
-RUN     apt -y install flex
+RUN     apt -y update && \
+	apt -y install flex
 RUN     cd /opt &&\
 	wget https://ftp.gnu.org/gnu/libmatheval/libmatheval-1.1.11.tar.gz &&\
 	tar xvfz libmatheval-1.1.11.tar.gz &&\
@@ -113,6 +119,7 @@ RUN     cd /opt &&\
 	rm -rf libmatheval-1.1.11.tar.gz libmatheval-1.1.11
 
  # install Perl modules
+RUN     apt -y update
 RUN     apt -y install expat
 RUN     apt -y install perl
 RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl
@@ -134,7 +141,9 @@ RUN     perl -MCPAN -e 'force("install","Text::Template")'
 RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
 # install git
-RUN     apt -y install git
+RUN     apt -y update && \
+	apt -y install git
 
 # install latex and related tools
-RUN     apt -y install texlive texlive-latex-extra texlive-science
+RUN     apt -y update && \
+	apt -y install texlive texlive-latex-extra texlive-science
