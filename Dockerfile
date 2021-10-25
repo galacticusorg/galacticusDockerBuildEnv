@@ -118,7 +118,7 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.11.tar.gz libmatheval-1.1.11
 
- # install Perl modules
+# install Perl modules
 RUN     apt -y update
 RUN     apt -y install expat
 RUN     apt -y install perl
@@ -147,3 +147,18 @@ RUN     apt -y update && \
 # install latex and related tools
 RUN     apt -y update && \
 	apt -y install texlive texlive-latex-extra texlive-science
+
+# install OpenMPI
+RUN     cd /opt &&\
+	wget https://download.open-mpi.org/release/open-mpi/v1.10/openmpi-1.10.7.tar.bz2 &&\
+	tar -vxjf openmpi-1.10.7.tar.bz2 &&\
+	cd openmpi-1.10.7 &&\
+	FC=gfortran ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
+	make -j4 &&\
+	make install &&\
+	cd .. &&\
+	rm -rf openmpi-1.10.7.tar.bz2 openmpi-1.10.7
+
+# install PDL and other tools needed for tests
+RUN     apt -y update
+RUN     apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl
