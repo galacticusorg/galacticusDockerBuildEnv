@@ -161,4 +161,4 @@ RUN     cd /opt &&\
 
 # install PDL and other tools needed for tests
 RUN     apt -y update
-RUN     apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl
+RUN     apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl
