@@ -160,6 +160,6 @@ RUN     cd /opt &&\
 	rm -rf openmpi-1.10.7.tar.bz2 openmpi-1.10.7
 
 # install PDL and other tools needed for tests
-RUN     apt -y update
-RUN     apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl
+RUN     apt -y update &&\
+        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
