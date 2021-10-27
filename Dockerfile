@@ -161,5 +161,5 @@ RUN     cd /opt &&\
 
 # install PDL and other tools needed for tests
 RUN     apt -y update &&\
-        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot
+        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
