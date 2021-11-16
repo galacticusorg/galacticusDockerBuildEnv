@@ -161,12 +161,14 @@ RUN     cd /opt &&\
 
 # install PDL and other tools needed for tests
 RUN     apt -y update &&\
-        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev
+        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
 RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
 RUN     perl -MCPAN -e 'force("install","Astro::FITS::CFITSIO")'
 RUN     perl -MCPAN -e 'force("install","XML::LibXML::PrettyPrint")'
 RUN     perl -MCPAN -e 'force("install","POSIX::strftime::GNU")'
+RUN     perl -MCPAN -e 'force("install","Math::SigFigs")'
+RUN     perl -MCPAN -e 'force("install","Image::ExifTool")'
 
 # install qhull library
 ENV GALACTICUS_CPPFLAGS "$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
