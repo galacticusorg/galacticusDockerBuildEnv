@@ -163,3 +163,13 @@ RUN     cd /opt &&\
 RUN     apt -y update &&\
         DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-io-hdf5-perl libpdl-stats-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
+
+# install qhull library
+ENV GALACTICUS_CPPFLAGS "$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
+RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
+	tar xvfz qhull-2020-src-8.0.2.tgz &&\
+	cd qhull-2020.2 &&\
+	PREFIX=$INSTALL_PATH make &&\
+	PREFIX=$INSTALL_PATH make install &&\
+	cd .. &&\
+	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
