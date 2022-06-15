@@ -7,18 +7,20 @@ RUN apt -y update && \
     apt -y install wget make xz-utils
 
 ENV INSTALL_PATH /usr/local
-ENV PATH $INSTALL_PATH/gcc-11/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-11/lib64:$INSTALL_PATH/gcc-11/lib:/usr/lib/x86_64-linux-gnu
+ENV PATH $INSTALL_PATH/gcc-12/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-12/lib64:$INSTALL_PATH/gcc-12/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
-ENV GCC_VERSION 11-20211009
+ENV GCC_VERSION 12-20220611
+
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
-ENV GALACTICUS_FCFLAGS "-fintrinsic-modules-path $INSTALL_PATH//finclude -fintrinsic-modules-path $INSTALL_PATH//include -fintrinsic-modules-path $INSTALL_PATH//include/gfortran -fintrinsic-modules-path $INSTALL_PATH//lib/gfortran/modules -L$INSTALL_PATH//lib -L$INSTALL_PATH//lib64 -fuse-ld=bfd"
+ENV GALACTICUS_FCFLAGS "-fintrinsic-modules-path $INSTALL_PATH/finclude -fintrinsic-modules-path $INSTALL_PATH/include -fintrinsic-modules-path $INSTALL_PATH/include/gfortran -fintrinsic-modules-path $INSTALL_PATH/lib/gfortran/modules -L$INSTALL_PATH/lib -L$INSTALL_PATH/lib64 -fuse-ld=bfd -DTHREADSAFEIO"
 ENV GALACTICUS_CFLAGS "-fuse-ld=bfd"
 ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 
 # Ensure tzdata is installed and be sure to do it non-interactively otherwise is can ask for the timezone which will crash the build.
+RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
