@@ -182,3 +182,20 @@ RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	PREFIX=$INSTALL_PATH make install &&\
 	cd .. &&\
 	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
+
+# reduce security level of OpenSSL to allow communication with older servers
+RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
+	cat /etc/ssl/openssl.cnf >> /opt/openssl.cnf &&\
+	echo "" >> /opt/openssl.cnf &&\
+	echo "[ default_conf ]" >> /opt/openssl.cnf &&\
+	echo "" >> /opt/openssl.cnf &&\
+	echo "ssl_conf = ssl_sect" >> /opt/openssl.cnf &&\
+	echo "" >> /opt/openssl.cnf &&\
+	echo "[ssl_sect]" >> /opt/openssl.cnf &&\
+	echo "" >> /opt/openssl.cnf &&\
+	echo "system_default = system_default_sect" >> /opt/openssl.cnf &&\
+	echo "" >> /opt/openssl.cnf &&\
+	echo "[system_default_sect]" >> /opt/openssl.cnf &&\
+	echo "MinProtocol = TLSv1.2" >> /opt/openssl.cnf &&\
+	echo "CipherString = DEFAULT:@SECLEVEL=1" >> /opt/openssl.cnf &&\
+	mv /opt/openssl.cnf /etc/ssl/openssl.cnf
