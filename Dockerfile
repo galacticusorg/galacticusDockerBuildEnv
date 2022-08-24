@@ -4,7 +4,7 @@
 FROM ubuntu:latest as build
 
 RUN apt -y update && \
-    apt -y install wget make xz-utils
+    apt -y install wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
 ENV PATH $INSTALL_PATH/gcc-13/bin:$INSTALL_PATH/bin:$PATH
