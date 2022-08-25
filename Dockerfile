@@ -148,7 +148,7 @@ RUN     apt -y update && \
 
 # install latex and related tools
 RUN     apt -y update && \
-	apt -y install texlive texlive-latex-extra texlive-science
+	apt -y install texlive texlive-latex-extra texlive-science texlive-extra-utils
 
 # install OpenMPI
 RUN     cd /opt &&\
