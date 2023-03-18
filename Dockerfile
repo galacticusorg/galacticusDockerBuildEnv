@@ -38,7 +38,7 @@ RUN     apt -y update && \
 # Install newer binutils
 RUN     cd $INSTALL_PATH &&\
         wget https://ftp.gnu.org/gnu/binutils/binutils-2.40.tar.xz &&\
-        tar -xvzf binutils-2.40.tar.xz &&\
+        tar -xf binutils-2.40.tar.xz &&\
         mkdir build_binutils &&\
         cd build_binutils &&\
         ../binutils-2.40/configure --prefix=$GLIBC_PATH &&\
@@ -49,7 +49,7 @@ RUN     cd $INSTALL_PATH &&\
 # Install newer glibc
 RUN     cd $INSTALL_PATH &&\
         wget http://ftp.gnu.org/gnu/libc/glibc-2.37.tar.gz &&\
-        tar -xvzf glibc-2.37.tar.gz &&\
+        tar -xf glibc-2.37.tar.gz &&\
         mkdir build_glibc &&\
         cd build_glibc &&\
         ../glibc-2.37/configure --prefix=$GLIBC_PATH &&\
