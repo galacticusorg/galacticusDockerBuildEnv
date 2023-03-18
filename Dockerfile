@@ -25,13 +25,7 @@ ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
-# Install a binary of gcc so we get a sufficiently current version.
-RUN     cd $INSTALL_PATH &&\
-	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
-	tar xf gcc-$GCC_VERSION.tar.xz &&\
-	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
-	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
+# Install tools
 RUN     apt -y update && \
 	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3 texinfo
 
@@ -56,6 +50,14 @@ RUN     cd $INSTALL_PATH &&\
         make -j2 &&\
         make -j2 install &&\
         rm -rf glibc-2.37.tar.gz glibc-2.37 build_glibc
+
+# Install a binary of gcc so we get a sufficiently current version.
+RUN     cd $INSTALL_PATH &&\
+	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
+	tar xf gcc-$GCC_VERSION.tar.xz &&\
+	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
+	tar xf gcc-infrastructure.tar.xz &&\
+	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
 
 # install GSL v2.6
 RUN     apt -y update && \
