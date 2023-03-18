@@ -33,7 +33,7 @@ RUN     cd $INSTALL_PATH &&\
 	tar xf gcc-infrastructure.tar.xz &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y update && \
-	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3
+	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3 texinfo
 
 # Install newer binutils
 RUN     cd $INSTALL_PATH &&\
