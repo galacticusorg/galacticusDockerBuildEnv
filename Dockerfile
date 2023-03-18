@@ -7,8 +7,8 @@ RUN apt -y update && \
     apt -y install wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
-ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20230311
+ENV GCC_MAJOR 13
+ENV GCC_VERSION 13-20230312
 ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
@@ -33,6 +33,17 @@ RUN     cd $INSTALL_PATH &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y update && \
 	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
+
+# Install newer glibc
+RUN     cd $INSTALL_PATH &&\
+        wget http://ftp.gnu.org/gnu/libc/glibc-2.37.tar.gz &&\
+        tar -xvzf glibc-2.37.tar.gz &&\
+        mkdir build_glibc &&\
+        cd build_glibc &&\
+        ../glibc-2.37/configure --prefix=$INSTALL_PATH &&\
+        make -j2 &&\
+        make -j2 install &&\
+        rm -rf glibc-2.37.tar.gz glibc-2.37 build_glibc
 
 # install GSL v2.6
 RUN     apt -y update && \
