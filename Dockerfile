@@ -7,10 +7,11 @@ RUN apt -y update && \
     apt -y install wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
+ENV GLIBC_PATH /usr/local/glibc
 ENV GCC_MAJOR 13
 ENV GCC_VERSION 13-20230312
-ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
+ENV PATH $GLIBC_PATH/bin:$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $GLIBC_PATH/lib64:$GLIBC_PATH/lib:$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
 # Set build options.
@@ -40,7 +41,7 @@ RUN     cd $INSTALL_PATH &&\
         tar -xvzf glibc-2.37.tar.gz &&\
         mkdir build_glibc &&\
         cd build_glibc &&\
-        ../glibc-2.37/configure --prefix=$INSTALL_PATH &&\
+        ../glibc-2.37/configure --prefix=$GLIBC_PATH &&\
         make -j2 &&\
         make -j2 install &&\
         rm -rf glibc-2.37.tar.gz glibc-2.37 build_glibc
