@@ -27,7 +27,7 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install tools
 RUN     apt -y update && \
-	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3 texinfo
+	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3 texinfo gcc g++
 
 # Install newer binutils
 RUN     cd $INSTALL_PATH &&\
