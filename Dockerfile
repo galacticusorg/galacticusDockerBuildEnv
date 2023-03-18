@@ -35,6 +35,17 @@ RUN     cd $INSTALL_PATH &&\
 RUN     apt -y update && \
 	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3
 
+# Install newer binutils
+RUN     cd $INSTALL_PATH &&\
+        wget https://ftp.gnu.org/gnu/binutils/binutils-2.40.tar.xz &&\
+        tar -xvzf binutils-2.40.tar.xz &&\
+        mkdir build_binutils &&\
+        cd build_binutils &&\
+        ../binutils-2.40/configure --prefix=$GLIBC_PATH &&\
+        make -j2 &&\
+        make -j2 install &&\
+        rm -rf binutils-2.40.tar.gz binutils-2.40 build_glibc
+
 # Install newer glibc
 RUN     cd $INSTALL_PATH &&\
         wget http://ftp.gnu.org/gnu/libc/glibc-2.37.tar.gz &&\
