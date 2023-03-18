@@ -47,7 +47,7 @@ RUN     cd $INSTALL_PATH &&\
         mkdir build_glibc &&\
         cd build_glibc &&\
         ../glibc-2.37/configure --prefix=$GLIBC_PATH &&\
-        make -j2 &&\
+        make  &&\
         make -j2 install &&\
         rm -rf glibc-2.37.tar.gz glibc-2.37 build_glibc
 
