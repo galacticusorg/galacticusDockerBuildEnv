@@ -7,11 +7,10 @@ RUN apt -y update && \
     apt -y install wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
-ENV GLIBC_PATH /usr/local/glibc
-ENV GCC_MAJOR 13
-ENV GCC_VERSION 13-20230312
-ENV PATH $GLIBC_PATH/bin:$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $GLIBC_PATH/lib64:$GLIBC_PATH/lib:$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
+ENV GCC_MAJOR 12
+ENV GCC_VERSION 12-20230311
+ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
 # Set build options.
@@ -25,32 +24,6 @@ ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
-# Install tools
-RUN     apt -y update && \
-	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib gawk bison python3 texinfo gcc g++
-
-# Install newer binutils
-RUN     cd $INSTALL_PATH &&\
-        wget https://ftp.gnu.org/gnu/binutils/binutils-2.40.tar.xz &&\
-        tar -xf binutils-2.40.tar.xz &&\
-        mkdir build_binutils &&\
-        cd build_binutils &&\
-        ../binutils-2.40/configure --prefix=$GLIBC_PATH &&\
-        make -j2 &&\
-        make -j2 install &&\
-        rm -rf binutils-2.40.tar.gz binutils-2.40 build_glibc
-
-# Install newer glibc
-RUN     cd $INSTALL_PATH &&\
-        wget http://ftp.gnu.org/gnu/libc/glibc-2.37.tar.gz &&\
-        tar -xf glibc-2.37.tar.gz &&\
-        mkdir build_glibc &&\
-        cd build_glibc &&\
-        ../glibc-2.37/configure --prefix=$GLIBC_PATH &&\
-        make  &&\
-        make -j2 install &&\
-        rm -rf glibc-2.37.tar.gz glibc-2.37 build_glibc
-
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
 	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
@@ -58,6 +31,8 @@ RUN     cd $INSTALL_PATH &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
+RUN     apt -y update && \
+	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v2.6
 RUN     apt -y update && \
