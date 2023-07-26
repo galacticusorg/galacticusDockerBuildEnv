@@ -107,18 +107,18 @@ RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
 	cd .. &&\
 	rm -rf xvfz guile-1.8.8.tar.gz guile-1.8.8
 
-# install matheval v1.1.11 (optional)
+# install matheval v1.1.12 (optional)
 RUN     apt -y update && \
 	apt -y install flex
 RUN     cd /opt &&\
-	wget https://ftp.gnu.org/gnu/libmatheval/libmatheval-1.1.11.tar.gz &&\
-	tar xvfz libmatheval-1.1.11.tar.gz &&\
-	cd libmatheval-1.1.11 &&\
+	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.12.tar.gz &&\
+	tar xvfz libmatheval-1.1.12.tar.gz &&\
+	cd libmatheval-1.1.12 &&\
 	CFLAGS=-I/usr/include/x86_64-linux-gnu ./configure --prefix=$INSTALL_PATH/ &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf libmatheval-1.1.11.tar.gz libmatheval-1.1.11
+	rm -rf libmatheval-1.1.12.tar.gz libmatheval-1.1.12
 
 # install Perl modules
 RUN     apt -y update
