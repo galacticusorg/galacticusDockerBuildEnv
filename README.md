@@ -1,6 +1,6 @@
 # Docker Build Environment for Galacticus
 
-[![hostedOnDockerHub](https://img.shields.io/docker/cloud/automated/galacticusorg/buildenv)](https://hub.docker.com/repository/docker/galacticusorg/buildenv) [![hostedOnDockerHub](https://img.shields.io/docker/cloud/build/galacticusorg/buildenv)](https://hub.docker.com/repository/docker/galacticusorg/buildenv) 
+[![Builder-Docker](https://github.com/galacticusorg/galacticusDockerBuildEnv/actions/workflows/buildDocker.yml/badge.svg)](https://github.com/galacticusorg/galacticusDockerBuildEnv/actions/workflows/buildDocker.yml)
 
 A Docker container providing a build environment for the [Galacticus](https://github.com/galacticusorg/galacticus) galaxy formation model. It provides all compilers, libraries, and tools for compiling Galacticus from source.
 
@@ -11,7 +11,7 @@ The following instructions show how to build Galacticus using this Docker contai
 * Pre-requisite: you must have a [Docker](https://www.docker.com/) engine installed and running on your system
 
 * Download the Galacticus Build Environment image from the Docker repository:
-  * `docker pull galacticusorg/buildenv:latest`
+  * `docker pull ghcr.io/galacticusorg/buildenv:latest`
   
 * Start a container from the image:
   * `docker run --rm --name buildenv -it galacticusorg/buildenv:latest bash`

@@ -7,10 +7,11 @@ RUN apt -y update && \
     apt -y install wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
-ENV PATH $INSTALL_PATH/gcc-13/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-13/lib64:$INSTALL_PATH/gcc-13/lib:/usr/lib/x86_64-linux-gnu
+ENV GCC_MAJOR 12
+ENV GCC_VERSION 12-20230311
+ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
-ENV GCC_VERSION 13-20220710
 
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
