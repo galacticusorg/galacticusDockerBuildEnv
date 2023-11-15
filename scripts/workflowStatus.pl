@@ -4,7 +4,7 @@ use warnings;
 use JSON;
 use Data::Dumper;
 
-my $repo = "docker";
+my $repo = "galacticusDockerBuildEnv";
 
 my @workflows =
     (
