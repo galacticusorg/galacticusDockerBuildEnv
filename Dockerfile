@@ -8,7 +8,7 @@ RUN apt -y update && \
 
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20231103
+ENV GCC_VERSION 12-20240315
 ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
@@ -125,7 +125,7 @@ RUN     cd /opt &&\
 RUN     apt -y update
 RUN     apt -y install expat
 RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl
+RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl libwww-curl-perl libjson-pp-perl perl-doc libtext-bibtex-perl
 # make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
 RUN     mkdir -p $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
 	cd $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
