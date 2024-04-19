@@ -25,10 +25,16 @@ while ( my $line = <$dockerFile> ) {
 	unless ( $line =~ m/^(RUN\s)??\s*wget\s+(\S+)/ );
     my $source = $2;
     $source =~ s/\$GCC_VERSION/$GCC_VERSION/;
-    (my $fileName = $source) =~ s/.*\/(.+)/$1/;
-    unless ( -e $archivePath.$fileName ) {
+    my $fileName;
+    my $path;
+    if ( $source =~ m/^(http|https|ftp):\/\/(.*)\/(.+)/ ) {
+	$path     = $2;
+	$fileName = $3;
+	system("mkdir -p ".$archivePath.$path);
+    }
+    unless ( -e $archivePath.$path."/".$fileName ) {
 	$report->{'report'} .= "RETRIEVING: ".$source."\n";
-	system("wget ".$source." -O ".$archivePath.$fileName);
+	system("wget ".$source." -O ".$archivePath.$path."/".$fileName);
 	unless ( $? == 0 ) {
 	    $report->{'report'} .= "\tFAILED: ".$source."\n";
 	}
