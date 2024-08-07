@@ -10,7 +10,7 @@ ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
-RUN echo -e '#!/bin/bash\nunset LD_LIBRARY_PATH\n /usr/bin/apt $@' > /usr/local/bin/apt && \
+RUN echo -e '#!/bin/bash\nunset LD_LIBRARY_PATH\n /usr/bin/apt \$@' > /usr/local/bin/apt && \
     chmod a+x /usr/local/bin/apt
 
 RUN apt -y update && \
