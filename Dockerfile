@@ -145,7 +145,7 @@ RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
 # install git
 RUN     apt -y update && \
-	apt -y install git
+	apt -y install git libgit2-dev
 
 # install latex and related tools
 RUN     apt -y update && \
