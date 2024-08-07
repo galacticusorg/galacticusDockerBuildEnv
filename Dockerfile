@@ -3,9 +3,6 @@
 
 FROM ubuntu:latest as build
 
-RUN apt -y update && \
-    apt -y install wget make xz-utils bzip2
-
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
 ENV GCC_VERSION 12-20240801
@@ -13,6 +10,11 @@ ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
+RUN echo -e '#!/bin/bash\nunset LD_LIBRARY_PATH\n /usr/bin/apt $@' > /usr/local/bin/apt && \
+    chmod a+x /usr/local/bin/apt
+
+RUN apt -y update && \
+    apt -y install wget make xz-utils bzip2
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
