@@ -3,8 +3,9 @@
 
 FROM ubuntu:latest as build
 
-RUN apt -y update && \
-    apt -y install wget make xz-utils bzip2
+# Install packages via apt (non-interactively otherwise it can ask for the timezone which will crash the build).
+RUN     apt -y update && \
+	DEBIAN_FRONTEND="noninteractive" apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib texinfo zlib1g-dev libltdl-dev libgmp-dev flex expat perl libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl libwww-curl-perl libjson-pp-perl perl-doc libtext-bibtex-perl git libgit2-dev texlive texlive-latex-extra texlive-science texlive-extra-utils pdl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl libclass-date-perl tzdata wget make xz-utils bzip2
 
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
@@ -20,10 +21,6 @@ ENV GALACTICUS_FCFLAGS "-fintrinsic-modules-path $INSTALL_PATH/finclude -fintrin
 ENV GALACTICUS_CFLAGS "-fuse-ld=bfd"
 ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
 
-# Ensure tzdata is installed and be sure to do it non-interactively otherwise is can ask for the timezone which will crash the build.
-RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
-RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
-
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
 	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
@@ -31,12 +28,8 @@ RUN     cd $INSTALL_PATH &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
-RUN     apt -y update && \
-	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
 # install GSL v2.6
-RUN     apt -y update && \
-	apt -y install texinfo
 RUN     cd /opt &&\
  	wget ftp://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz &&\
  	tar xvfz gsl-2.6.tar.gz &&\
@@ -49,8 +42,6 @@ RUN     cd /opt &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
 	
 # install HDF5 v1.8.20
-RUN     apt -y update && \
-	apt -y install zlib1g-dev
 RUN     cd /opt &&\
 	wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.gz &&\
 	tar -vxzf hdf5-1.8.20.tar.gz &&\
@@ -97,8 +88,6 @@ RUN     cd /opt &&\
 	rm -rf ann_1.1.2.tar.gz ann_1.1.2
 
 # install guile v1.8.8 (optional)
-RUN     apt -y update && \
-	apt -y install libltdl-dev libgmp-dev
 RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
 	tar xvfz guile-1.8.8.tar.gz &&\
 	cd guile-1.8.8 &&\
@@ -109,8 +98,6 @@ RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
 	rm -rf xvfz guile-1.8.8.tar.gz guile-1.8.8
 
 # install matheval v1.1.12 (optional)
-RUN     apt -y update && \
-	apt -y install flex
 RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.12.tar.gz &&\
 	tar xvfz libmatheval-1.1.12.tar.gz &&\
@@ -122,10 +109,6 @@ RUN     cd /opt &&\
 	rm -rf libmatheval-1.1.12.tar.gz libmatheval-1.1.12
 
 # install Perl modules
-RUN     apt -y update
-RUN     apt -y install expat
-RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl libwww-curl-perl libjson-pp-perl perl-doc libtext-bibtex-perl
 # make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
 RUN     mkdir -p $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
 	cd $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
@@ -143,14 +126,6 @@ RUN     perl -MCPAN -e 'force("install","XML::SAX::ParserFactory")'
 RUN     perl -MCPAN -e 'force("install","Text::Template")'
 RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
-# install git
-RUN     apt -y update && \
-	apt -y install git libgit2-dev
-
-# install latex and related tools
-RUN     apt -y update && \
-	apt -y install texlive texlive-latex-extra texlive-science texlive-extra-utils
-
 # install OpenMPI
 RUN     cd /opt &&\
 	wget https://download.open-mpi.org/release/open-mpi/v1.10/openmpi-1.10.7.tar.bz2 &&\
@@ -163,8 +138,6 @@ RUN     cd /opt &&\
 	rm -rf openmpi-1.10.7.tar.bz2 openmpi-1.10.7
 
 # install PDL and other tools needed for tests
-RUN     apt -y update &&\
-        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl libclass-date-perl
 RUN     perl -MCPAN -e 'force("install","PDL::IO::HDF5")'
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
 RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
