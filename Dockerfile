@@ -10,10 +10,15 @@ ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
+# CReate wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
+# our GCC install and complain about it being out of date.
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
-	chmod a+x /usr/local/bin/apt && \
-	cat /usr/local/bin/apt
+	chmod a+x /usr/local/bin/apt
 
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
+	chmod a+x /usr/local/bin/gnuplot
+
+# Install basic tools to allow us to download and build.
 RUN apt -y update && \
     apt -y install wget make xz-utils bzip2
 # Set build options.
