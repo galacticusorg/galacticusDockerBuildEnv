@@ -5,12 +5,12 @@ FROM ubuntu:latest as build
 
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20240801
+ENV GCC_VERSION 12-20240926
 ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
 
-# CReate wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
+# Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
 # our GCC install and complain about it being out of date.
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
 	chmod a+x /usr/local/bin/apt
@@ -128,6 +128,10 @@ RUN     cd /opt &&\
 	make install &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.12.tar.gz libmatheval-1.1.12
+
+# install Python modules
+RUN     apt -y update
+RUN     apt -y install python3-minimal libhdf5-dev python3-h5py python3-numpy python3-lxml python3-blessings
 
 # install Perl modules
 RUN     apt -y update

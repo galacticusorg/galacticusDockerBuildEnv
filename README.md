@@ -14,7 +14,7 @@ The following instructions show how to build Galacticus using this Docker contai
   * `docker pull ghcr.io/galacticusorg/buildenv:latest`
   
 * Start a container from the image:
-  * `docker run --rm --name buildenv -it galacticusorg/buildenv:latest bash`
+  * `docker run --rm --name buildenv -it ghcr.io/galacticusorg/buildenv:latest bash`
 
 * Once inside the container, you can clone the Galacticus repos and compile (this will take a while, maybe 30 minutes), for example:
 ```
