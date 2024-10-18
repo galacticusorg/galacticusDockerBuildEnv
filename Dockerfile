@@ -129,10 +129,6 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.12.tar.gz libmatheval-1.1.12
 
-# install Python modules
-RUN     apt -y update
-RUN     apt -y install python3-minimal libhdf5-dev python3-h5py python3-numpy python3-lxml python3-blessings
-
 # install Perl modules
 RUN     apt -y update
 RUN     apt -y install expat
@@ -195,6 +191,12 @@ RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	PREFIX=$INSTALL_PATH make install &&\
 	cd .. &&\
 	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
+
+# install Python modules - this brings in the system HDF5 library - we must therefore do this *AFTER* building PDL::IO::HDF5 to
+# avoid that picking up the system HDF5 include files and then having issues when it links against our own HDF5 install at run
+# time.
+RUN     apt -y update
+RUN     apt -y install python3-minimal libhdf5-dev python3-h5py python3-numpy python3-lxml python3-blessings
 
 # reduce security level of OpenSSL to allow communication with older servers
 RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
