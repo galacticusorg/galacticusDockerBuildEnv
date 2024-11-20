@@ -5,7 +5,7 @@ FROM ubuntu:latest as build
 
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20240926
+ENV GCC_VERSION 12-20241031
 ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
@@ -17,6 +17,9 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/
 
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
 	chmod a+x /usr/local/bin/gnuplot
+
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
+	chmod a+x /usr/local/bin/gs
 
 # Install basic tools to allow us to download and build.
 RUN apt -y update && \
