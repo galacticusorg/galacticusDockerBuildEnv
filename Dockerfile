@@ -59,18 +59,18 @@ RUN     cd /opt &&\
  	cd .. &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
 	
-# install HDF5 v1.8.20
+# install HDF5 v1.14.5
 RUN     apt -y update && \
 	apt -y install zlib1g-dev
 RUN     cd /opt &&\
-	wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.20/src/hdf5-1.8.20.tar.gz &&\
-	tar -vxzf hdf5-1.8.20.tar.gz &&\
-	cd hdf5-1.8.20 &&\
-	F9X=gfortran ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-production &&\
+	wget https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-1.14.5.tar.gz &&\
+	tar -vxzf hdf5-1.14.5.tar.gz &&\
+	cd hdf5-1.14.5 &&\
+	F9X=gfortran ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf hdf5-1.8.20.tar.gz hdf5-1.8.20
+	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
    
 # install FoX v4.1.0
 RUN     cd /opt &&\
