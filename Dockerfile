@@ -5,7 +5,7 @@ FROM ubuntu:latest as build
 
 ENV INSTALL_PATH /usr/local
 ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20241128
+ENV GCC_VERSION 12-20250528
 ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
@@ -74,14 +74,14 @@ RUN     cd /opt &&\
    
 # install FoX v4.1.0
 RUN     cd /opt &&\
-	wget https://github.com/andreww/fox/archive/4.1.0.tar.gz &&\
-	tar xvfz 4.1.0.tar.gz &&\
-	cd fox-4.1.0 &&\
+	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
+	tar xvfz v4.1.3.tar.gz &&\
+	cd fox-4.1.3 &&\
 	FC=gfortran FCFLAGS="-fPIC" CFLAGS="-fPIC" ./configure &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf xvfz 4.1.0.tar.gz fox-4.1.0
+	rm -rf xvfz v4.1.3.tar.gz fox-4.1.3
     
 # install FFTW 3.3.4 (optional)
 RUN     cd /opt &&\
