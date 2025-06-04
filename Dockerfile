@@ -23,7 +23,7 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/g
 
 # Install basic tools to allow us to download and build.
 RUN apt -y update && \
-    apt -y install wget make xz-utils bzip2
+    apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
@@ -176,6 +176,9 @@ RUN     cd /opt &&\
 # install PDL and other tools needed for tests
 RUN     apt -y update &&\
         DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl libclass-date-perl
+# Need a link to the curl headers so that the Alien::CFITSIO module can find it on install.
+RUN     cd /usr/include &&\
+	ln -sf /usr/include/x86_64-linux-gnu/curl
 RUN     perl -MCPAN -e 'force("install","PDL::IO::HDF5")'
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
 RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
