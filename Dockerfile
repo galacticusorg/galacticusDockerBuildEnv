@@ -23,7 +23,7 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/g
 
 # Install basic tools to allow us to download and build.
 RUN apt -y update && \
-    apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev
+    apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev patch
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
@@ -199,6 +199,17 @@ RUN     cd /usr/include &&\
 RUN     perl -MCPAN -e 'force("install","PDL::IO::HDF5")'
 RUN     perl -MCPAN -e 'force("install","Imager::Color")'
 RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
+RUN     perl -MCPAN -e 'force("install","Alien::Build")'
+RUN     perl -MCPAN -e 'force("install","Alien::curl")'
+# Ugly attempt to ensure Alien::CFITSIO gets installed and avoid problems with timeouts from the NASA server that supplies the
+# CFITSIO library.
+RUN     perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
+RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
+RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
+RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
+RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
+RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")'
+RUN     perl -e "use Alien::CFITSIO"
 RUN     perl -MCPAN -e 'force("install","Astro::FITS::CFITSIO")'
 RUN     perl -MCPAN -e 'force("install","XML::LibXML::PrettyPrint")'
 RUN     perl -MCPAN -e 'force("install","POSIX::strftime::GNU")'
