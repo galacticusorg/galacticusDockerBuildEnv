@@ -3,12 +3,12 @@
 
 FROM ubuntu:latest as build
 
-ENV INSTALL_PATH /usr/local
-ENV GCC_MAJOR 12
-ENV GCC_VERSION 12-20250528
-ENV PATH $INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH $INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
-ENV LIBRARY_PATH /usr/lib/x86_64-linux-gnu
+ENV INSTALL_PATH=/usr/local
+ENV GCC_MAJOR=12
+ENV GCC_VERSION=12-20250528
+ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
+ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 
 # Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
 # our GCC install and complain about it being out of date.
@@ -27,9 +27,9 @@ RUN apt -y update && \
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
-ENV GALACTICUS_FCFLAGS "-fintrinsic-modules-path $INSTALL_PATH/finclude -fintrinsic-modules-path $INSTALL_PATH/include -fintrinsic-modules-path $INSTALL_PATH/include/gfortran -fintrinsic-modules-path $INSTALL_PATH/lib/gfortran/modules -L$INSTALL_PATH/lib -L$INSTALL_PATH/lib64 -fuse-ld=bfd -DTHREADSAFEIO"
-ENV GALACTICUS_CFLAGS "-fuse-ld=bfd"
-ENV GALACTICUS_CPPFLAGS "-fuse-ld=bfd"
+ENV GALACTICUS_FCFLAGS="-fintrinsic-modules-path $INSTALL_PATH/finclude -fintrinsic-modules-path $INSTALL_PATH/include -fintrinsic-modules-path $INSTALL_PATH/include/gfortran -fintrinsic-modules-path $INSTALL_PATH/lib/gfortran/modules -L$INSTALL_PATH/lib -L$INSTALL_PATH/lib64 -fuse-ld=bfd -DTHREADSAFEIO"
+ENV GALACTICUS_CFLAGS="-fuse-ld=bfd"
+ENV GALACTICUS_CPPFLAGS="-fuse-ld=bfd"
 
 # Ensure tzdata is installed and be sure to do it non-interactively otherwise is can ask for the timezone which will crash the build.
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
@@ -217,7 +217,7 @@ RUN     perl -MCPAN -e 'force("install","Math::SigFigs")'
 RUN     perl -MCPAN -e 'force("install","Image::ExifTool")'
 
 # install qhull library
-ENV GALACTICUS_CPPFLAGS "$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
+ENV GALACTICUS_CPPFLAGS="$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
 RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	tar xvfz qhull-2020-src-8.0.2.tgz &&\
 	cd qhull-2020.2 &&\
