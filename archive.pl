@@ -18,7 +18,7 @@ my $report;
 my $GCC_VERSION;
 open(my $dockerFile,$dockerFileName);
 while ( my $line = <$dockerFile> ) {
-    if ( $line =~ m/^ENV\s+GCC_VERSION\s+(\S*)/ ) {
+    if ( $line =~ m/^ENV\s+GCC_VERSION\s*=\s*(\S*)/ ) {
 	$GCC_VERSION = $1;
     }
     next
