@@ -1,7 +1,7 @@
 # Galacticus Docker image
 # Uses Docker multi-stage build to build the build environment for Galacticus.
 
-FROM ubuntu:latest as build
+FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
 ENV GCC_MAJOR=12
