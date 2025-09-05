@@ -5,7 +5,7 @@ FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
 ENV GCC_MAJOR=12
-ENV GCC_VERSION=12-20250528
+ENV GCC_VERSION=12-20250702
 ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
@@ -215,6 +215,7 @@ RUN     perl -MCPAN -e 'force("install","XML::LibXML::PrettyPrint")'
 RUN     perl -MCPAN -e 'force("install","POSIX::strftime::GNU")'
 RUN     perl -MCPAN -e 'force("install","Math::SigFigs")'
 RUN     perl -MCPAN -e 'force("install","Image::ExifTool")'
+RUN     perl -MCPAN -e 'force("install","System::CPU")'
 
 # install qhull library
 ENV GALACTICUS_CPPFLAGS="$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
