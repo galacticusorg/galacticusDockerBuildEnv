@@ -72,7 +72,7 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
    
-# install FoX v4.1.0
+# install FoX v4.1.3
 RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
 	tar xvfz v4.1.3.tar.gz &&\
