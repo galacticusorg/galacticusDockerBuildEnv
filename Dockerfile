@@ -21,8 +21,10 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
 	chmod a+x /usr/local/bin/gs
 
-# Install basic tools to allow us to download and build.
+# Install basic tools to allow us to download and build. Also remove tools we do not need to save space.
 RUN apt -y update && \
+    apt -y remove java-common ruby3.2 && \
+    apt -y autoremove && \
     apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev patch
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
