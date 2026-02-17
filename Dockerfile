@@ -4,8 +4,8 @@
 FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
-ENV GCC_MAJOR=12
-ENV GCC_VERSION=12-20250702
+ENV GCC_MAJOR=16
+ENV GCC_VERSION=trunk-20260217-gr16-7534-g333ae149a07
 ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
@@ -39,7 +39,7 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz &&\
+    wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz &&\
 	tar xf gcc-$GCC_VERSION.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
@@ -166,14 +166,14 @@ RUN     apt -y update && \
 
 # install OpenMPI
 RUN     cd /opt &&\
-	wget https://download.open-mpi.org/release/open-mpi/v1.10/openmpi-1.10.7.tar.bz2 &&\
-	tar -vxjf openmpi-1.10.7.tar.bz2 &&\
-	cd openmpi-1.10.7 &&\
+	wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.8.tar.bz2 &&\
+	tar -vxjf openmpi-4.1.8.tar.bz2 &&\
+	cd openmpi-4.1.8 &&\
 	FC=gfortran ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf openmpi-1.10.7.tar.bz2 openmpi-1.10.7
+	rm -rf openmpi-4.1.8.tar.bz2 openmpi-4.1.8
 
 # reduce security level of OpenSSL to allow communication with older servers
 RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
