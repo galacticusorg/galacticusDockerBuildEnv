@@ -101,7 +101,7 @@ RUN     cd /opt &&\
 	wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz &&\
 	tar xvfz ann_1.1.2.tar.gz &&\
 	cd ann_1.1.2 &&\
-	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 -fPIC"/ Make-config &&\
+	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 -fPIC -std=c++17"/ Make-config &&\
 	make linux-g++  &&\
 	cp bin/* $INSTALL_PATH/bin/. &&\
 	cp lib/* $INSTALL_PATH/lib/. &&\
