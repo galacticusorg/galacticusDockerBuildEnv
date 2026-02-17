@@ -4,7 +4,7 @@
 FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
-ENV GCC_MAJOR=16
+ENV GCC_MAJOR=trunk
 ENV GCC_VERSION=trunk-20260217-gr16-7534-g333ae149a07
 ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
@@ -39,7 +39,7 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-    wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz &&\
+	wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz &&\
 	tar xf gcc-$GCC_VERSION.tar.xz &&\
 	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
 	tar xf gcc-infrastructure.tar.xz &&\
