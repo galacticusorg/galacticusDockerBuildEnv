@@ -109,30 +109,18 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf ann_1.1.2.tar.gz ann_1.1.2
 
-# install guile v1.8.8 (optional)
+# install matheval v1.1.13 (optional)
 RUN     apt -y update && \
-	apt -y install libltdl-dev libgmp-dev
-RUN	wget https://ftp.gnu.org/gnu/guile/guile-1.8.8.tar.gz &&\
-	tar xvfz guile-1.8.8.tar.gz &&\
-	cd guile-1.8.8 &&\
-	CFLAGS=-I/usr/include/x86_64-linux-gnu ./configure --prefix=$INSTALL_PATH/ --disable-error-on-warning &&\
-	make -j4 &&\
-	make install &&\
-	cd .. &&\
-	rm -rf xvfz guile-1.8.8.tar.gz guile-1.8.8
-
-# install matheval v1.1.12 (optional)
-RUN     apt -y update && \
-	apt -y install flex
+	apt -y install bison flex guile-3.0 guile-3.0-dev gettext
 RUN     cd /opt &&\
-	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.12.tar.gz &&\
-	tar xvfz libmatheval-1.1.12.tar.gz &&\
-	cd libmatheval-1.1.12 &&\
-	CFLAGS=-I/usr/include/x86_64-linux-gnu ./configure --prefix=$INSTALL_PATH/ &&\
+	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.13.tar.gz &&\
+	tar xvfz libmatheval-1.1.13.tar.gz &&\
+	cd libmatheval-1.1.13 &&\
+	CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf libmatheval-1.1.12.tar.gz libmatheval-1.1.12
+	rm -rf libmatheval-1.1.13.tar.gz libmatheval-1.1.13
 
 # install Perl modules
 RUN     apt -y update
