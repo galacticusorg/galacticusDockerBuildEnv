@@ -79,7 +79,7 @@ RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
 	tar xvfz v4.1.3.tar.gz &&\
 	cd fox-4.1.3 &&\
-	FC=gfortran FCFLAGS="-fPIC" CFLAGS="-fPIC" ./configure &&\
+	FC=gfortran FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
