@@ -133,6 +133,7 @@ RUN     mkdir -p $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
 	ln -sf /etc/perl/XML/SAX/ParserDetails.ini
 
 ENV PERL_MM_USE_DEFAULT=1
+RUN     perl -MCPAN -e 'CPAN::HandleConfig->load(); $CPAN::Config->{pushy_https} = 0; $CPAN::Config->{urllist} = [ q{https://cpan.metacpan.org/}, q{https://www.cpan.org/}, q{https://cpan.perl.org/}, q{http://ftp.funet.fi/pub/languages/perl/CPAN/}, q{ftp://ftp.cpan.org/pub/CPAN/}, ]; CPAN::HandleConfig->commit();'
 RUN     perl -MCPAN -e 'force("install","Cwd")'
 RUN     perl -MCPAN -e 'force("install","Data::Dumper")'
 RUN     perl -MCPAN -e 'force("install","File::Copy")'
