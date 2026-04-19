@@ -15,6 +15,9 @@ ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
 	chmod a+x /usr/local/bin/apt
 
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt-get $@' > /usr/local/bin/apt-get && \
+	chmod a+x /usr/local/bin/apt-get
+
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
 	chmod a+x /usr/local/bin/gnuplot
 
