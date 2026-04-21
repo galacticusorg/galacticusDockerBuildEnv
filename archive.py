@@ -24,10 +24,10 @@ with open(docker_file_name) as f:
         m = re.search(r'^ENV\s+GCC_VERSION\s*=\s*(\S*)', line)
         if m:
             gcc_version = m.group(1)
-        m = re.search(r'^(?:RUN\s+)?wget\s+(\S+)', line)
+        m = re.search(r'^(RUN\s)??\s*wget\s+(\S+)', line)
         if not m:
             continue
-        source = m.group(1)
+        source = m.group(2)
         if gcc_version:
             source = source.replace('$GCC_VERSION', gcc_version)
         m2 = re.search(r'^(?:http|https|ftp)://(.+)/([^/]+)$', source)
