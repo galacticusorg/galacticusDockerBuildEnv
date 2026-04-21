@@ -2,7 +2,6 @@
 import json
 import os
 import re
-import subprocess
 import sys
 import urllib.request
 import urllib.error
@@ -43,8 +42,9 @@ with open(docker_file_name) as f:
             report_text += f"SKIPPING: (already archived) {source}\n"
         else:
             report_text += f"RETRIEVING: {source}\n"
-            result = subprocess.run(["wget", source, "-O", dest_file])
-            if result.returncode != 0:
+            try:
+                urllib.request.urlretrieve(source, dest_file)
+            except urllib.error.URLError:
                 report_text += f"\tFAILED: {source}\n"
 
 payload = json.dumps({"report": report_text}).encode("utf-8")
