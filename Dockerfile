@@ -24,8 +24,8 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
 	chmod a+x /usr/local/bin/gs
 
-RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/python3 $@' > /usr/local/bin/python3 && \
-	chmod a+x /usr/local/bin/python3
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/python3 $@' > /usr/local/bin/python3-nolib && \
+	chmod a+x /usr/local/bin/python3-nolib
 
 # Install basic tools to allow us to download and build. Also remove tools we do not need to save space.
 RUN apt -y update && \
