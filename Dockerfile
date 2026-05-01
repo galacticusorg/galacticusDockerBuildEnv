@@ -18,9 +18,6 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt-get $@' > /usr/local/bin/apt-get && \
 	chmod a+x /usr/local/bin/apt-get
 
-RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
-	chmod a+x /usr/local/bin/gnuplot
-
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
 	chmod a+x /usr/local/bin/gs
 
@@ -128,29 +125,6 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.13.tar.gz libmatheval-1.1.13
 
-# install Perl modules
-RUN     apt -y update
-RUN     apt -y install expat
-RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl libwww-curl-perl libjson-pp-perl perl-doc libtext-bibtex-perl libtext-levenshtein-perl
-# make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
-RUN     mkdir -p $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
-	cd $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
-	ln -sf /etc/perl/XML/SAX/ParserDetails.ini
-
-ENV PERL_MM_USE_DEFAULT=1
-RUN     perl -MCPAN -e 'CPAN::HandleConfig->load(); $CPAN::Config->{pushy_https} = 0; $CPAN::Config->{urllist} = [ q{https://cpan.metacpan.org/}, q{https://www.cpan.org/}, q{https://cpan.perl.org/}, q{http://ftp.funet.fi/pub/languages/perl/CPAN/}, q{ftp://ftp.cpan.org/pub/CPAN/}, ]; CPAN::HandleConfig->commit();'
-RUN     perl -MCPAN -e 'force("install","Cwd")'
-RUN     perl -MCPAN -e 'force("install","Data::Dumper")'
-RUN     perl -MCPAN -e 'force("install","File::Copy")'
-RUN     perl -MCPAN -e 'force("install","NestedMap")'
-RUN     perl -MCPAN -e 'force("install","Scalar::Util")'
-RUN     perl -MCPAN -e 'force("install","Term::ANSIColor")'
-RUN     perl -MCPAN -e 'force("install","Text::Table")'
-RUN     perl -MCPAN -e 'force("install","XML::SAX::ParserFactory")'
-RUN     perl -MCPAN -e 'force("install","Text::Template")'
-RUN     perl -MCPAN -e 'force("install","List::Uniq")'
-
 # install git
 RUN     apt -y update && \
 	apt -y install git libgit2-dev
@@ -187,32 +161,9 @@ RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
 	echo "CipherString = DEFAULT:@SECLEVEL=1" >> /opt/openssl.cnf &&\
 	mv /opt/openssl.cnf /etc/ssl/openssl.cnf
 
-# install PDL and other tools needed for tests
+# install tools needed for tests
 RUN     apt -y update &&\
-        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl libclass-date-perl
-# Need a link to the curl headers so that the Alien::CFITSIO module can find it on install.
-RUN     cd /usr/include &&\
-	ln -sf /usr/include/x86_64-linux-gnu/curl
-RUN     perl -MCPAN -e 'force("install","PDL::IO::HDF5")'
-RUN     perl -MCPAN -e 'force("install","Imager::Color")'
-RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
-RUN     perl -MCPAN -e 'force("install","Alien::Build")'
-RUN     perl -MCPAN -e 'force("install","Alien::curl")'
-# Ugly attempt to ensure Alien::CFITSIO gets installed and avoid problems with timeouts from the NASA server that supplies the
-# CFITSIO library.
-RUN     perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")'
-RUN     perl -e "use Alien::CFITSIO"
-RUN     perl -MCPAN -e 'force("install","Astro::FITS::CFITSIO")'
-RUN     perl -MCPAN -e 'force("install","XML::LibXML::PrettyPrint")'
-RUN     perl -MCPAN -e 'force("install","POSIX::strftime::GNU")'
-RUN     perl -MCPAN -e 'force("install","Math::SigFigs")'
-RUN     perl -MCPAN -e 'force("install","Image::ExifTool")'
-RUN     perl -MCPAN -e 'force("install","System::CPU")'
+        DEBIAN_FRONTEND="noninteractive" apt -y install libxml2-utils
 
 # install qhull library
 ENV GALACTICUS_CPPFLAGS="$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
@@ -224,8 +175,15 @@ RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	cd .. &&\
 	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
 
-# install Python modules - this brings in the system HDF5 library - we must therefore do this *AFTER* building PDL::IO::HDF5 to
-# avoid that picking up the system HDF5 include files and then having issues when it links against our own HDF5 install at run
-# time.
-RUN     apt -y update
-RUN     apt -y install python3-minimal libhdf5-dev python3-h5py python3-numpy python3-lxml python3-blessings
+# install Python and Python modules needed by Galacticus' build infrastructure, test suite, and analysis scripts.
+# Note: `python3-h5py` pulls in the system HDF5 library; this is independent of our custom HDF5 install in $INSTALL_PATH which
+# is what Galacticus itself links against.
+RUN     apt -y update && \
+        apt -y install python3-minimal python3-pip libhdf5-dev \
+            python3-h5py python3-numpy python3-lxml python3-yaml python3-pytest \
+            python3-requests python3-matplotlib python3-scipy python3-astropy \
+            python3-termcolor python3-git
+# Install Python packages not available in Debian repositories.
+# Note: `cusp_halo_relation`, `samana`, `pyHalo`, and the heavy ML stack (TensorFlow, etc.) are intentionally not installed
+# here - they are handled by the per-job setup in Galacticus' CI workflows.
+RUN     pip3 install --break-system-packages PyPDF2 num2tex colossus
