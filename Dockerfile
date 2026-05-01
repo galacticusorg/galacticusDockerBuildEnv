@@ -184,4 +184,6 @@ RUN     apt -y update && \
             python3-requests python3-matplotlib python3-scipy python3-astropy \
             python3-termcolor python3-git
 # Install Python packages not available in Debian repositories.
-RUN     pip3 install --break-system-packages PyPDF2 num2tex colossus cusp_halo_relation
+# Note: `cusp_halo_relation`, `samana`, `pyHalo`, and the heavy ML stack (TensorFlow, etc.) are intentionally not installed
+# here - they are handled by the per-job setup in Galacticus' CI workflows.
+RUN     pip3 install --break-system-packages PyPDF2 num2tex colossus
