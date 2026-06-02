@@ -105,7 +105,7 @@ RUN     cd /opt &&\
     
 # install ANN 1.1.2 (optional)
 RUN     cd /opt &&\
-	wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz &&\
+	( wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz || wget -c -O ann_1.1.2.tar.gz https://web.archive.org/web/20250824053429id_/http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz ) &&\
 	tar xvfz ann_1.1.2.tar.gz &&\
 	cd ann_1.1.2 &&\
 	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 \-fPIC \-std=c\+\+17"/ Make-config &&\
