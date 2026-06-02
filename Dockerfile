@@ -29,9 +29,11 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/python3 $@' > /usr/local/
 
 # Install basic tools to allow us to download and build. Also remove tools we do not need to save space.
 RUN apt -y update && \
-    apt -y remove java-common ruby3.2 && \
+    dpkg -l | grep -q '^ii  java-common ' && apt -y remove java-common || true && \
+    apt-cache pkgnames | grep -qx 'ruby' && apt -y remove ruby || true && \
     apt -y autoremove && \
     apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev patch
+
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
