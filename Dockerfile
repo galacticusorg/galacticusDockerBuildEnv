@@ -4,22 +4,17 @@
 FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
-ENV GCC_MAJOR=trunk
-ENV GCC_VERSION=trunk-20260401-gr16-8374-g6487521cc18
-ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
+ENV PATH=$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 
-# Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
-# our GCC install and complain about it being out of date.
+# Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libraries from
+# our custom install in $INSTALL_PATH (e.g. libhdf5) that are incompatible with these system tools.
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
 	chmod a+x /usr/local/bin/apt
 
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt-get $@' > /usr/local/bin/apt-get && \
 	chmod a+x /usr/local/bin/apt-get
-
-RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
-	chmod a+x /usr/local/bin/gnuplot
 
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
 	chmod a+x /usr/local/bin/gs
@@ -45,13 +40,17 @@ ENV GALACTICUS_CPPFLAGS="-fuse-ld=bfd"
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
-# Install a binary of gcc so we get a sufficiently current version.
-RUN     cd $INSTALL_PATH &&\
-	( wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-$GCC_VERSION.tar.xz ) &&\
-	tar xf gcc-$GCC_VERSION.tar.xz &&\
-	( wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-infrastructure.tar.xz )  &&\
-	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
+# Install GCC 16 (gcc, g++, gfortran) from the Ubuntu repositories. These are provided as versioned commands (gcc-16,
+# g++-16, gfortran-16), so we create unversioned symlinks in $INSTALL_PATH/bin - which is first in PATH - so that any tool
+# which invokes `gcc`, `g++`, or `gfortran` (including Galacticus' own build) uses the GCC 16 versions.
+RUN     apt -y update && \
+	apt -y install gcc-16 g++-16 gfortran-16 cpp-16 && \
+	ln -s /usr/bin/gcc-16      $INSTALL_PATH/bin/gcc      && \
+	ln -s /usr/bin/gcc-16      $INSTALL_PATH/bin/cc       && \
+	ln -s /usr/bin/g++-16      $INSTALL_PATH/bin/g++      && \
+	ln -s /usr/bin/g++-16      $INSTALL_PATH/bin/c++      && \
+	ln -s /usr/bin/gfortran-16 $INSTALL_PATH/bin/gfortran && \
+	ln -s /usr/bin/cpp-16      $INSTALL_PATH/bin/cpp
 RUN     apt -y update && \
 	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
@@ -62,9 +61,9 @@ RUN     cd /opt &&\
  	wget ftp://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz &&\
  	tar xvfz gsl-2.6.tar.gz &&\
  	cd gsl-2.6 &&\
- 	./configure --prefix=$INSTALL_PATH &&\
- 	make -j4 &&\
- 	make check &&\
+ 	CC=gcc-16 ./configure --prefix=$INSTALL_PATH &&\
+ 	make -j$(nproc) &&\
+ 	make -j$(nproc) check &&\
  	make install &&\
  	cd .. &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
@@ -76,8 +75,8 @@ RUN     cd /opt &&\
 	wget https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-1.14.5.tar.gz &&\
 	tar -vxzf hdf5-1.14.5.tar.gz &&\
 	cd hdf5-1.14.5 &&\
-	F9X=gfortran ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
-	make -j4 &&\
+	CC=gcc-16 CXX=g++-16 FC=gfortran-16 ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
@@ -87,8 +86,8 @@ RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
 	tar xvfz v4.1.3.tar.gz &&\
 	cd fox-4.1.3 &&\
-	FC=gfortran FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
-	make -j4 &&\
+	CC=gcc-16 FC=gfortran-16 FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf xvfz v4.1.3.tar.gz fox-4.1.3
@@ -98,15 +97,15 @@ RUN     cd /opt &&\
 	wget ftp://ftp.fftw.org/pub/fftw/fftw-3.3.4.tar.gz &&\
 	tar xvfz fftw-3.3.4.tar.gz &&\
 	cd fftw-3.3.4 &&\
-	CFLAGS="-fPIC" FFLAGS="-fPIC" ./configure --prefix=$INSTALL_PATH &&\
-	make -j4 &&\
+	CC=gcc-16 CFLAGS="-fPIC" FFLAGS="-fPIC" ./configure --prefix=$INSTALL_PATH &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf xvfz fftw-3.3.4.tar.gz fftw-3.3.4
     
 # install ANN 1.1.2 (optional)
 RUN     cd /opt &&\
-	wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz &&\
+	( wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz || wget -c -O ann_1.1.2.tar.gz https://web.archive.org/web/20250824053429id_/http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz ) &&\
 	tar xvfz ann_1.1.2.tar.gz &&\
 	cd ann_1.1.2 &&\
 	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 \-fPIC \-std=c\+\+17"/ Make-config &&\
@@ -124,34 +123,11 @@ RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.13.tar.gz &&\
 	tar xvfz libmatheval-1.1.13.tar.gz &&\
 	cd libmatheval-1.1.13 &&\
-	CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
-	make -j4 &&\
+	CC=gcc-16 CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.13.tar.gz libmatheval-1.1.13
-
-# install Perl modules
-RUN     apt -y update
-RUN     apt -y install expat
-RUN     apt -y install perl
-RUN     apt -y install libyaml-perl libdatetime-perl libfile-slurp-perl liblatex-encode-perl libxml-simple-perl libxml-validator-schema-perl libxml-sax-perl libxml-sax-expat-perl libregexp-common-perl libfile-next-perl liblist-moreutils-perl libio-stringy-perl libclone-perl libfile-which-perl libwww-curl-perl libjson-pp-perl perl-doc libtext-bibtex-perl libtext-levenshtein-perl
-# make a link to ParserDetails.ini - otherwise Perl seems unable to find it.
-RUN     mkdir -p $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
-	cd $INSTALL_PATH/share/perl/5.34.0/XML/SAX &&\
-	ln -sf /etc/perl/XML/SAX/ParserDetails.ini
-
-ENV PERL_MM_USE_DEFAULT=1
-RUN     perl -MCPAN -e 'CPAN::HandleConfig->load(); $CPAN::Config->{pushy_https} = 0; $CPAN::Config->{urllist} = [ q{https://cpan.metacpan.org/}, q{https://www.cpan.org/}, q{https://cpan.perl.org/}, q{http://ftp.funet.fi/pub/languages/perl/CPAN/}, q{ftp://ftp.cpan.org/pub/CPAN/}, ]; CPAN::HandleConfig->commit();'
-RUN     perl -MCPAN -e 'force("install","Cwd")'
-RUN     perl -MCPAN -e 'force("install","Data::Dumper")'
-RUN     perl -MCPAN -e 'force("install","File::Copy")'
-RUN     perl -MCPAN -e 'force("install","NestedMap")'
-RUN     perl -MCPAN -e 'force("install","Scalar::Util")'
-RUN     perl -MCPAN -e 'force("install","Term::ANSIColor")'
-RUN     perl -MCPAN -e 'force("install","Text::Table")'
-RUN     perl -MCPAN -e 'force("install","XML::SAX::ParserFactory")'
-RUN     perl -MCPAN -e 'force("install","Text::Template")'
-RUN     perl -MCPAN -e 'force("install","List::Uniq")'
 
 # install git
 RUN     apt -y update && \
@@ -166,8 +142,8 @@ RUN     cd /opt &&\
 	wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.8.tar.bz2 &&\
 	tar -vxjf openmpi-4.1.8.tar.bz2 &&\
 	cd openmpi-4.1.8 &&\
-	FC=gfortran ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
-	make -j4 &&\
+	CC=gcc-16 CXX=g++-16 FC=gfortran-16 ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf openmpi-4.1.8.tar.bz2 openmpi-4.1.8
@@ -189,45 +165,29 @@ RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
 	echo "CipherString = DEFAULT:@SECLEVEL=1" >> /opt/openssl.cnf &&\
 	mv /opt/openssl.cnf /etc/ssl/openssl.cnf
 
-# install PDL and other tools needed for tests
+# install tools needed for tests
 RUN     apt -y update &&\
-        DEBIAN_FRONTEND="noninteractive" apt -y install pdl libpdl-stats-perl libpdl-linearalgebra-perl libsys-cpu-perl libio-compress-perl libcapture-tiny-perl gnuplot libxml2-utils libmime-lite-perl libdata-uuid-perl libcfitsio-dev libswitch-perl libwww-curl-perl libclass-date-perl
-# Need a link to the curl headers so that the Alien::CFITSIO module can find it on install.
-RUN     cd /usr/include &&\
-	ln -sf /usr/include/x86_64-linux-gnu/curl
-RUN     perl -MCPAN -e 'force("install","PDL::IO::HDF5")'
-RUN     perl -MCPAN -e 'force("install","Imager::Color")'
-RUN     perl -MCPAN -e 'force("install","Astro::Cosmology")'
-RUN     perl -MCPAN -e 'force("install","Alien::Build")'
-RUN     perl -MCPAN -e 'force("install","Alien::curl")'
-# Ugly attempt to ensure Alien::CFITSIO gets installed and avoid problems with timeouts from the NASA server that supplies the
-# CFITSIO library.
-RUN     perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")' && sleep 10
-RUN     perl -e "use Alien::CFITSIO" || perl -MCPAN -e 'force("install","Alien::CFITSIO")'
-RUN     perl -e "use Alien::CFITSIO"
-RUN     perl -MCPAN -e 'force("install","Astro::FITS::CFITSIO")'
-RUN     perl -MCPAN -e 'force("install","XML::LibXML::PrettyPrint")'
-RUN     perl -MCPAN -e 'force("install","POSIX::strftime::GNU")'
-RUN     perl -MCPAN -e 'force("install","Math::SigFigs")'
-RUN     perl -MCPAN -e 'force("install","Image::ExifTool")'
-RUN     perl -MCPAN -e 'force("install","System::CPU")'
+        DEBIAN_FRONTEND="noninteractive" apt -y install libxml2-utils
 
 # install qhull library
 ENV GALACTICUS_CPPFLAGS="$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcpp"
 RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	tar xvfz qhull-2020-src-8.0.2.tgz &&\
 	cd qhull-2020.2 &&\
-	PREFIX=$INSTALL_PATH make &&\
+	PREFIX=$INSTALL_PATH make CC=gcc-16 CXX=g++-16 &&\
 	PREFIX=$INSTALL_PATH make install &&\
 	cd .. &&\
 	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
 
-# install Python modules - this brings in the system HDF5 library - we must therefore do this *AFTER* building PDL::IO::HDF5 to
-# avoid that picking up the system HDF5 include files and then having issues when it links against our own HDF5 install at run
-# time.
-RUN     apt -y update
-RUN     apt -y install python3-minimal libhdf5-dev python3-h5py python3-numpy python3-lxml python3-blessings
+# install Python and Python modules needed by Galacticus' build infrastructure, test suite, and analysis scripts.
+# Note: `python3-h5py` pulls in the system HDF5 library; this is independent of our custom HDF5 install in $INSTALL_PATH which
+# is what Galacticus itself links against.
+RUN     apt -y update && \
+        apt -y install python3-minimal python3-pip libhdf5-dev \
+            python3-h5py python3-numpy python3-lxml python3-yaml python3-pytest \
+            python3-requests python3-matplotlib python3-scipy python3-astropy \
+            python3-termcolor python3-git
+# Install Python packages not available in Debian repositories.
+# Note: `cusp_halo_relation`, `samana`, `pyHalo`, and the heavy ML stack (TensorFlow, etc.) are intentionally not installed
+# here - they are handled by the per-job setup in Galacticus' CI workflows.
+RUN     pip3 install --break-system-packages PyPDF2 num2tex colossus
