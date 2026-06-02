@@ -4,8 +4,8 @@
 FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
-ENV GCC_MAJOR=12
-ENV GCC_VERSION=12-20250702
+ENV GCC_MAJOR=trunk
+ENV GCC_VERSION=trunk-20260401-gr16-8374-g6487521cc18
 ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
 ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
@@ -26,9 +26,11 @@ RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/python3 $@' > /usr/local/
 
 # Install basic tools to allow us to download and build. Also remove tools we do not need to save space.
 RUN apt -y update && \
-    apt -y remove java-common ruby3.2 && \
+    dpkg -l | grep -q '^ii  java-common ' && apt -y remove java-common || true && \
+    apt-cache pkgnames | grep -qx 'ruby' && apt -y remove ruby || true && \
     apt -y autoremove && \
     apt -y install wget make xz-utils bzip2 curl libcurl4-openssl-dev patch
+
 # Set build options.
 ## We force use of the BFD linker here. The GCC in galacticus/buildenv:latest uses the gold linker by default. But, the gold
 ## linker seems to not correctly allow us to get values of some GSL constants (e.g. gsl_root_fsolver_brent) in Fortran.
@@ -42,7 +44,7 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	( wget https://gfortran.meteodat.ch/download/x86_64/snapshots/gcc-$GCC_VERSION.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-$GCC_VERSION.tar.xz ) &&\
+	( wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-$GCC_VERSION.tar.xz ) &&\
 	tar xf gcc-$GCC_VERSION.tar.xz &&\
 	( wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-infrastructure.tar.xz )  &&\
 	tar xf gcc-infrastructure.tar.xz &&\
@@ -104,7 +106,7 @@ RUN     cd /opt &&\
 	wget http://www.cs.umd.edu/~mount/ANN/Files/1.1.2/ann_1.1.2.tar.gz &&\
 	tar xvfz ann_1.1.2.tar.gz &&\
 	cd ann_1.1.2 &&\
-	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 -fPIC"/ Make-config &&\
+	sed -i~ -r s/"CFLAGS = \-O3"/"CFLAGS = \-O3 \-fPIC \-std=c\+\+17"/ Make-config &&\
 	make linux-g++  &&\
 	cp bin/* $INSTALL_PATH/bin/. &&\
 	cp lib/* $INSTALL_PATH/lib/. &&\
@@ -135,14 +137,14 @@ RUN     apt -y update && \
 
 # install OpenMPI
 RUN     cd /opt &&\
-	wget https://download.open-mpi.org/release/open-mpi/v1.10/openmpi-1.10.7.tar.bz2 &&\
-	tar -vxjf openmpi-1.10.7.tar.bz2 &&\
-	cd openmpi-1.10.7 &&\
+	wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.8.tar.bz2 &&\
+	tar -vxjf openmpi-4.1.8.tar.bz2 &&\
+	cd openmpi-4.1.8 &&\
 	FC=gfortran ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
 	make -j4 &&\
 	make install &&\
 	cd .. &&\
-	rm -rf openmpi-1.10.7.tar.bz2 openmpi-1.10.7
+	rm -rf openmpi-4.1.8.tar.bz2 openmpi-4.1.8
 
 # reduce security level of OpenSSL to allow communication with older servers
 RUN     echo "openssl_conf = default_conf" > /opt/openssl.cnf &&\
