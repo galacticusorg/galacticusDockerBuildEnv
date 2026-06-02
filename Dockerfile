@@ -15,11 +15,17 @@ ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
 	chmod a+x /usr/local/bin/apt
 
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt-get $@' > /usr/local/bin/apt-get && \
+	chmod a+x /usr/local/bin/apt-get
+
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gnuplot $@' > /usr/local/bin/gnuplot && \
 	chmod a+x /usr/local/bin/gnuplot
 
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/gs $@' > /usr/local/bin/gs && \
 	chmod a+x /usr/local/bin/gs
+
+RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/python3 $@' > /usr/local/bin/python3-nolib && \
+	chmod a+x /usr/local/bin/python3-nolib
 
 # Install basic tools to allow us to download and build. Also remove tools we do not need to save space.
 RUN apt -y update && \
@@ -39,9 +45,9 @@ RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
 # Install a binary of gcc so we get a sufficiently current version.
 RUN     cd $INSTALL_PATH &&\
-	wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz &&\
+	( wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-$GCC_VERSION.tar.xz ) &&\
 	tar xf gcc-$GCC_VERSION.tar.xz &&\
-	wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz &&\
+	( wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-infrastructure.tar.xz )  &&\
 	tar xf gcc-infrastructure.tar.xz &&\
 	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
 RUN     apt -y update && \
