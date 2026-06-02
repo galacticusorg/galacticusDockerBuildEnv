@@ -4,14 +4,12 @@
 FROM ubuntu:latest AS build
 
 ENV INSTALL_PATH=/usr/local
-ENV GCC_MAJOR=trunk
-ENV GCC_VERSION=trunk-20260401-gr16-8374-g6487521cc18
-ENV PATH=$INSTALL_PATH/gcc-$GCC_MAJOR/bin:$INSTALL_PATH/bin:$PATH
-ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:$INSTALL_PATH/gcc-$GCC_MAJOR/lib64:$INSTALL_PATH/gcc-$GCC_MAJOR/lib:/usr/lib/x86_64-linux-gnu
+ENV PATH=$INSTALL_PATH/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALL_PATH/lib64:$INSTALL_PATH/lib:/usr/lib/x86_64-linux-gnu
 ENV LIBRARY_PATH=/usr/lib/x86_64-linux-gnu
 
-# Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libstdc++ from
-# our GCC install and complain about it being out of date.
+# Create wrapper scripts for certain commands. These require us to unset LD_LIBRARY_PATH, otherwise they pick up libraries from
+# our custom install in $INSTALL_PATH (e.g. libhdf5) that are incompatible with these system tools.
 RUN echo '#!/bin/bash\nunset LD_LIBRARY_PATH\n/usr/bin/apt $@' > /usr/local/bin/apt && \
 	chmod a+x /usr/local/bin/apt
 
@@ -42,13 +40,17 @@ ENV GALACTICUS_CPPFLAGS="-fuse-ld=bfd"
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y update
 RUN     DEBIAN_FRONTEND="noninteractive" apt -y install tzdata
 
-# Install a binary of gcc so we get a sufficiently current version.
-RUN     cd $INSTALL_PATH &&\
-	( wget https://gfortran.meteodat.ch/download/x86_64/nightlies/gcc-$GCC_VERSION.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-$GCC_VERSION.tar.xz ) &&\
-	tar xf gcc-$GCC_VERSION.tar.xz &&\
-	( wget http://gfortran.meteodat.ch/download/x86_64/gcc-infrastructure.tar.xz || wget -c https://users.obs.carnegiescience.edu/abenson/galacticus/gcc-infrastructure.tar.xz )  &&\
-	tar xf gcc-infrastructure.tar.xz &&\
-	rm gcc-$GCC_VERSION.tar.xz gcc-infrastructure.tar.xz
+# Install GCC 16 (gcc, g++, gfortran) from the Ubuntu repositories. These are provided as versioned commands (gcc-16,
+# g++-16, gfortran-16), so we create unversioned symlinks in $INSTALL_PATH/bin - which is first in PATH - so that any tool
+# which invokes `gcc`, `g++`, or `gfortran` (including Galacticus' own build) uses the GCC 16 versions.
+RUN     apt -y update && \
+	apt -y install gcc-16 g++-16 gfortran-16 cpp-16 && \
+	ln -s /usr/bin/gcc-16      $INSTALL_PATH/bin/gcc      && \
+	ln -s /usr/bin/gcc-16      $INSTALL_PATH/bin/cc       && \
+	ln -s /usr/bin/g++-16      $INSTALL_PATH/bin/g++      && \
+	ln -s /usr/bin/g++-16      $INSTALL_PATH/bin/c++      && \
+	ln -s /usr/bin/gfortran-16 $INSTALL_PATH/bin/gfortran && \
+	ln -s /usr/bin/cpp-16      $INSTALL_PATH/bin/cpp
 RUN     apt -y update && \
 	apt -y install libblas-dev liblapack-dev binutils libc-dev gcc-multilib
 
@@ -59,9 +61,9 @@ RUN     cd /opt &&\
  	wget ftp://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz &&\
  	tar xvfz gsl-2.6.tar.gz &&\
  	cd gsl-2.6 &&\
- 	./configure --prefix=$INSTALL_PATH &&\
- 	make -j4 &&\
- 	make check &&\
+ 	CC=gcc-16 ./configure --prefix=$INSTALL_PATH &&\
+ 	make -j$(nproc) &&\
+ 	make -j$(nproc) check &&\
  	make install &&\
  	cd .. &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
@@ -73,8 +75,8 @@ RUN     cd /opt &&\
 	wget https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-1.14.5.tar.gz &&\
 	tar -vxzf hdf5-1.14.5.tar.gz &&\
 	cd hdf5-1.14.5 &&\
-	F9X=gfortran ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
-	make -j4 &&\
+	CC=gcc-16 CXX=g++-16 FC=gfortran-16 ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
@@ -84,8 +86,8 @@ RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
 	tar xvfz v4.1.3.tar.gz &&\
 	cd fox-4.1.3 &&\
-	FC=gfortran FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
-	make -j4 &&\
+	CC=gcc-16 FC=gfortran-16 FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf xvfz v4.1.3.tar.gz fox-4.1.3
@@ -95,8 +97,8 @@ RUN     cd /opt &&\
 	wget ftp://ftp.fftw.org/pub/fftw/fftw-3.3.4.tar.gz &&\
 	tar xvfz fftw-3.3.4.tar.gz &&\
 	cd fftw-3.3.4 &&\
-	CFLAGS="-fPIC" FFLAGS="-fPIC" ./configure --prefix=$INSTALL_PATH &&\
-	make -j4 &&\
+	CC=gcc-16 CFLAGS="-fPIC" FFLAGS="-fPIC" ./configure --prefix=$INSTALL_PATH &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf xvfz fftw-3.3.4.tar.gz fftw-3.3.4
@@ -121,8 +123,8 @@ RUN     cd /opt &&\
 	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.13.tar.gz &&\
 	tar xvfz libmatheval-1.1.13.tar.gz &&\
 	cd libmatheval-1.1.13 &&\
-	CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
-	make -j4 &&\
+	CC=gcc-16 CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf libmatheval-1.1.13.tar.gz libmatheval-1.1.13
@@ -140,8 +142,8 @@ RUN     cd /opt &&\
 	wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.8.tar.bz2 &&\
 	tar -vxjf openmpi-4.1.8.tar.bz2 &&\
 	cd openmpi-4.1.8 &&\
-	FC=gfortran ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
-	make -j4 &&\
+	CC=gcc-16 CXX=g++-16 FC=gfortran-16 ./configure --prefix=$INSTALL_PATH --enable-mpi-thread-multiple --disable-dlopen &&\
+	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
 	rm -rf openmpi-4.1.8.tar.bz2 openmpi-4.1.8
@@ -172,7 +174,7 @@ ENV GALACTICUS_CPPFLAGS="$GALACTICUS_CPPFLAGS -I$INSTALL_PATH/include/libqhullcp
 RUN     wget http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz &&\
 	tar xvfz qhull-2020-src-8.0.2.tgz &&\
 	cd qhull-2020.2 &&\
-	PREFIX=$INSTALL_PATH make &&\
+	PREFIX=$INSTALL_PATH make CC=gcc-16 CXX=g++-16 &&\
 	PREFIX=$INSTALL_PATH make install &&\
 	cd .. &&\
 	rm -rf qhull-2020.2 qhull-2020-src-8.0.2.tgz
