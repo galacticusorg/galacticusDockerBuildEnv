@@ -81,16 +81,16 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
    
-# install FoX v4.1.3
+# install FoX v4.1.4
 RUN     cd /opt &&\
-	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.3.tar.gz &&\
-	tar xvfz v4.1.3.tar.gz &&\
-	cd fox-4.1.3 &&\
+	wget https://github.com/galacticusorg/fox/archive/refs/tags/v4.1.4.tar.gz &&\
+	tar xvfz v4.1.4.tar.gz &&\
+	cd fox-4.1.4 &&\
 	CC=gcc-16 FC=gfortran-16 FCFLAGS="-fPIC -g" CFLAGS="-fPIC -g" ./configure &&\
 	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
-	rm -rf xvfz v4.1.3.tar.gz fox-4.1.3
+	rm -rf xvfz v4.1.4.tar.gz fox-4.1.4
     
 # install FFTW 3.3.4 (optional)
 RUN     cd /opt &&\
