@@ -68,18 +68,38 @@ RUN     cd /opt &&\
  	cd .. &&\
  	rm -rf gsl-2.6.tar.gz gsl-2.6
 	
-# install HDF5 v1.14.5
+# install HDF5 2.1.0. HDF5 2.x is built with CMake (the Autotools build system was removed in HDF5 2.0). Deprecated symbols
+# are disabled to build against the strict HDF5 2.x API surface; Galacticus caps its own output format at the HDF5 1.14
+# version so that output remains readable by HDF5 1.14 readers.
 RUN     apt -y update && \
-	apt -y install zlib1g-dev
+	apt -y install zlib1g-dev cmake
 RUN     cd /opt &&\
-	wget https://support.hdfgroup.org/releases/hdf5/v1_14/v1_14_5/downloads/hdf5-1.14.5.tar.gz &&\
-	tar -vxzf hdf5-1.14.5.tar.gz &&\
-	cd hdf5-1.14.5 &&\
-	CC=gcc-16 CXX=g++-16 FC=gfortran-16 ./configure --prefix=$INSTALL_PATH --enable-fortran --enable-build-mode=production &&\
-	make -j$(nproc) &&\
-	make install &&\
+	wget https://github.com/HDFGroup/hdf5/releases/download/2.1.0/hdf5-2.1.0.tar.gz &&\
+	tar -vxzf hdf5-2.1.0.tar.gz &&\
+	cd hdf5-2.1.0 &&\
+	cmake -S . -B build -G "Unix Makefiles" \
+		-DCMAKE_INSTALL_PREFIX=$INSTALL_PATH \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_C_COMPILER=gcc-16 \
+		-DCMAKE_CXX_COMPILER=g++-16 \
+		-DCMAKE_Fortran_COMPILER=gfortran-16 \
+		-DBUILD_SHARED_LIBS=ON \
+		-DBUILD_STATIC_LIBS=ON \
+		-DBUILD_TESTING=OFF \
+		-DHDF5_BUILD_FORTRAN=ON \
+		-DHDF5_BUILD_HL_LIB=ON \
+		-DHDF5_BUILD_CPP_LIB=OFF \
+		-DHDF5_BUILD_TOOLS=ON \
+		-DHDF5_BUILD_EXAMPLES=OFF \
+		-DHDF5_ENABLE_PARALLEL=OFF \
+		-DHDF5_ENABLE_ZLIB_SUPPORT=ON \
+		-DHDF5_ENABLE_SZIP_SUPPORT=OFF \
+		-DHDF5_ENABLE_DEPRECATED_SYMBOLS=OFF \
+		-DHDF5_DEFAULT_API_VERSION=v200 &&\
+	cmake --build build -j$(nproc) &&\
+	cmake --install build &&\
 	cd .. &&\
-	rm -rf hdf5-1.14.5.tar.gz hdf5-1.14.5
+	rm -rf hdf5-2.1.0.tar.gz hdf5-2.1.0
    
 # install FoX v4.1.4
 RUN     cd /opt &&\
