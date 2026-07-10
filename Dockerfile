@@ -95,6 +95,7 @@ RUN     cd /opt &&\
 		-DHDF5_ENABLE_ZLIB_SUPPORT=ON \
 		-DHDF5_ENABLE_SZIP_SUPPORT=OFF \
 		-DHDF5_ENABLE_DEPRECATED_SYMBOLS=OFF \
+		-DHDF5_ENABLE_NONSTANDARD_FEATURE_FLOAT16=OFF \
 		-DHDF5_DEFAULT_API_VERSION=v200 &&\
 	cmake --build build -j$(nproc) &&\
 	cmake --install build &&\
