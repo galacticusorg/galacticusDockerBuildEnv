@@ -137,18 +137,18 @@ RUN     cd /opt &&\
 	cd .. &&\
 	rm -rf ann_1.1.2.tar.gz ann_1.1.2
 
-# install matheval v1.1.13 (optional)
+# install matheval v1.1.14 (optional)
 RUN     apt -y update && \
 	apt -y install bison flex guile-3.0 guile-3.0-dev gettext
 RUN     cd /opt &&\
-	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.13.tar.gz &&\
-	tar xvfz libmatheval-1.1.13.tar.gz &&\
-	cd libmatheval-1.1.13 &&\
+	wget https://github.com/galacticusorg/libmatheval/releases/download/latest/libmatheval-1.1.14.tar.gz &&\
+	tar xvfz libmatheval-1.1.14.tar.gz &&\
+	cd libmatheval-1.1.14 &&\
 	CC=gcc-16 CFLAGS="-I/usr/include/x86_64-linux-gnu -I/usr/include/guile/3.0" ./configure --prefix=$INSTALL_PATH/ &&\
 	make -j$(nproc) &&\
 	make install &&\
 	cd .. &&\
-	rm -rf libmatheval-1.1.13.tar.gz libmatheval-1.1.13
+	rm -rf libmatheval-1.1.14.tar.gz libmatheval-1.1.14
 
 # install git
 RUN     apt -y update && \
